@@ -15,7 +15,6 @@ static int comment_depth = 0;
 
 #define ID 0
 #define KEY 1
-#define OP 2
 %}
 
 /* Definitions Section */
@@ -25,6 +24,8 @@ letter  [A-Za-z_]
 digit   [0-9]
 whitespace  [ \t]
 
+SING_OP     [\(\)\[\]\{\}\.\,\!\*\/\%\+\-\<\>\&\;\=]
+WS          ({whitespace}|\n)+
 ID          {letter}({digit}|{letter})*
 INT_CONST   [1-9]{digit}*|0
 FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
@@ -36,7 +37,13 @@ FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
   /* All comments in this section must be indented. */
 
   /* ignore whitespace */
-{whitespace}+ {}
+{WS} {}
+
+  /* if operator detected */
+{SING_OP} {
+  if(comment_depth != 0) return 0;
+  printf("OP\t%s\n", yytext);
+}
 
   /* if ID detected */
 {ID} {
