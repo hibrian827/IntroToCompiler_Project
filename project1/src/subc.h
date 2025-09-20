@@ -22,6 +22,7 @@ typedef struct id {
 
 // Hash table interfaces
 unsigned hash(char *name);
+id *search(unsigned idx, char *name, int length);
 id *enter(int tokenType, char *name, int length);
 
 #endif

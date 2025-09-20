@@ -25,20 +25,26 @@ unsigned hash(char *s) {
     return hashval % HASH_TABLE_SIZE;
 }
 
-id *enter(int tokenType, char *name, int length) {
-  unsigned index = hash(name);
+id *search(unsigned idx, char *name, int length) {
   nlist *np;
-
-  // Search the table
-  for (np = hashTable[index]; np != NULL; np = np->next) {
+  for (np = hashTable[idx]; np != NULL; np = np->next) {
     if (strncmp(name, np->data->name, length) == 0 && np->data->name[length] == '\0') {
       np->data->count++;
       return np->data;
     }
   }
+  return NULL;
+}
+
+id *enter(int tokenType, char *name, int length) {
+  unsigned index = hash(name);
+  
+  // Search the table
+  id *res = search(index, name, length);
+  if (res != NULL) return res;
 
   // Not found -> create new entry
-  np = (nlist *)malloc(sizeof(*np));
+  nlist *np = (nlist *)malloc(sizeof(*np));
   if (np == NULL) return NULL;
 
   id *newId = (id *)malloc(sizeof(*newId));

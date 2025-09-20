@@ -12,12 +12,22 @@
 
 #include "subc.h"
 static int comment_depth = 0;
+
+#define ID 0
+#define KEY 1
+#define OP 2
 %}
 
 /* Definitions Section */
 /* This section contains simple name definitions and declarations of start conditions. */
 
 letter  [A-Za-z_]
+digit   [0-9]
+whitespace  [ \t]
+
+ID          {letter}({digit}|{letter})*
+INT_CONST   [1-9]{digit}*|0
+FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
 %start  AA BB
 
 %%
@@ -25,7 +35,31 @@ letter  [A-Za-z_]
   /* This section contains series of rules for recognizing tokens. */
   /* All comments in this section must be indented. */
 
-{letter}  { }
+  /* ignore whitespace */
+{whitespace}+ {}
+
+  /* if ID detected */
+{ID} {
+  unsigned idx = hash(yytext);
+  id *data = search(idx, yytext, yyleng);
+  // if it is the first
+  if(data == NULL) {
+    enter(ID, yytext, yyleng);
+    printf("ID\t%s\t1\n", yytext);
+  }
+  // if it is not the first
+  else {
+
+  }
+}
+  /* if int constant detected */
+{INT_CONST} {
+  printf("INT\t%s\n", yytext);
+}
+  /* if int constant detected */
+{FLOAT_CONST} {
+  printf("FLOAT\t%s\n", yytext);
+}
 
 %%
 
@@ -35,7 +69,7 @@ letter  [A-Za-z_]
 int main(int argc, char** argv) {
   // Define reserved keywords
   char *keyword[] = { "int", NULL };
-  int tokentype[] = { 0, 0 };  // placeholder; later something like { TYPE, 0 }
+  int tokentype[] = { KEY, 0 };  // placeholder; later something like { TYPE, 0 }
 
   // Initialize the hash table
   for(int i=0; keyword[i] != NULL; i++) {
