@@ -54,7 +54,7 @@ id *enter(int tokenType, char *name, int length) {
   }
 
   newId->tokenType = tokenType;
-  newId->count = 1;
+  newId->count = 0;
   newId->name = (char *)malloc(length + 1);
   if (newId->name == NULL) {
     free(newId);

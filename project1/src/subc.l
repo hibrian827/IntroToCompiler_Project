@@ -40,26 +40,40 @@ FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
 
   /* if ID detected */
 {ID} {
+  if(comment_depth != 0) return 0;
   unsigned idx = hash(yytext);
   id *data = search(idx, yytext, yyleng);
   // if it is the first
   if(data == NULL) {
-    enter(ID, yytext, yyleng);
+    id *new_data = enter(ID, yytext, yyleng);
+    new_data->count++;
     printf("ID\t%s\t1\n", yytext);
   }
   // if it is not the first
   else {
-
+    // if it is an ID
+    if(data->tokenType == ID) {
+      printf("ID\t%s\t%d\n", data->name, data->count);
+    }
+    // if it is a keyword
+    else {
+      printf("KEY\t%s\t%d\n", data->name, data->count);
+    }
   }
 }
   /* if int constant detected */
 {INT_CONST} {
+  if(comment_depth != 0) return 0;
   printf("INT\t%s\n", yytext);
 }
   /* if int constant detected */
 {FLOAT_CONST} {
-  printf("FLOAT\t%s\n", yytext);
+  if(comment_depth != 0) return 0;
+  printf("F\t%s\n", yytext);
 }
+
+  /* (DEBUG) ignore anything not handled */
+.                              ; 
 
 %%
 
@@ -68,8 +82,8 @@ FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
 
 int main(int argc, char** argv) {
   // Define reserved keywords
-  char *keyword[] = { "int", NULL };
-  int tokentype[] = { KEY, 0 };  // placeholder; later something like { TYPE, 0 }
+  char *keyword[] = { "int", "break", "char", "continue", "else", "float", "for", "if", "return", "struct", "while", "NULL", NULL };
+  int tokentype[] = { KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, -1 };  // placeholder; later something like { TYPE, 0 }
 
   // Initialize the hash table
   for(int i=0; keyword[i] != NULL; i++) {
