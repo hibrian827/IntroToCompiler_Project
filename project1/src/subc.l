@@ -24,11 +24,13 @@ letter  [A-Za-z_]
 digit   [0-9]
 whitespace  [ \t]
 
-SING_OP     [\(\)\[\]\{\}\.\,\!\*\/\%\+\-\<\>\&\;\=]
-WS          ({whitespace}|\n)+
-ID          {letter}({digit}|{letter})*
-INT_CONST   [1-9]{digit}*|0
-FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
+START_COMMENT "/*"
+END_COMMENT   "*/"
+OP            "("|")"|"["|"]"|"{"|"}"|"."|","|"!"|"*"|"/"|"%"|"+"|"-"|"<"|">"|"&"|";"|"="|"->"|".."|"++"|"--"|"<="|">="|"=="|"!="|"&&"|"||"
+WS            ({whitespace}|\n)+
+ID            {letter}({digit}|{letter})*
+INT_CONST     [1-9]{digit}*|0
+FLOAT_CONST   {digit}+\.{digit}*([eE][-+]?{digit}+)?
 %start  AA BB
 
 %%
@@ -39,15 +41,33 @@ FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
   /* ignore whitespace */
 {WS} {}
 
+  /* starting a comment */
+<AA>{START_COMMENT} {
+  comment_depth++;
+  BEGIN BB;
+}
+
+  /* starting a nesting comment */
+<BB>{START_COMMENT} {
+  comment_depth++;
+}
+
+  /* ending a comment */
+<BB>{END_COMMENT} {
+  comment_depth--;
+  if(comment_depth == 0) BEGIN AA;
+}
+
+  /* ignore rest in comments */
+<BB>. {}
+
   /* if operator detected */
-{SING_OP} {
-  if(comment_depth != 0) return 0;
+<AA>{OP} {
   printf("OP\t%s\n", yytext);
 }
 
   /* if ID detected */
-{ID} {
-  if(comment_depth != 0) return 0;
+<AA>{ID} {
   unsigned idx = hash(yytext);
   id *data = search(idx, yytext, yyleng);
   // if it is the first
@@ -68,19 +88,27 @@ FLOAT_CONST {digit}+\.{digit}*([eE][-+]?{digit}+)?
     }
   }
 }
+
+  /* detect .. behind digit */
+<AA>{digit}*\./\. {
+  // with digit
+  if(yyleng > 1) {
+    printf("INT\t");
+    for(int i = 0; i < yyleng - 1; i++) printf("%c", yytext[i]);
+    printf("\n");
+  }
+  printf("OP\t..\n");
+  input();
+}
+
   /* if int constant detected */
-{INT_CONST} {
-  if(comment_depth != 0) return 0;
+<AA>{INT_CONST} {
   printf("INT\t%s\n", yytext);
 }
   /* if int constant detected */
-{FLOAT_CONST} {
-  if(comment_depth != 0) return 0;
+<AA>{FLOAT_CONST} {
   printf("F\t%s\n", yytext);
 }
-
-  /* (DEBUG) ignore anything not handled */
-.                              ; 
 
 %%
 
