@@ -90,7 +90,7 @@ FLOAT_CONST   {digit}+\.{digit}*([eE][-+]?{digit}+)?
 }
 
   /* detect .. behind digit */
-<AA>{digit}*\./\. {
+<AA>{digit}*\./\.{digit} {
   // with digit
   if(yyleng > 1) {
     printf("INT\t");

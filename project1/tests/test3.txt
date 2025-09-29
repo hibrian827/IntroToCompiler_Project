@@ -1,0 +1,13 @@
+/* top comment
+   still comment
+   /* nested start
+      /* nested nested */
+   end nesting */
+   trailing text in comment line
+*/
+struct _point {
+  float x, y, z;
+  int color;
+}
+/* comment right before tokens */struct point[20];
+/* open-only (unterminated) at EOF starts here…

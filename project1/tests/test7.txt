@@ -1,0 +1,8 @@
+/* one */int a=0;/*two*/int b=1;/* three */
+/* mix */ a = 1..2; /* and */ b = 3...4;
+/* stars **** inside comment **** lots *****/// not C++ comment per lexer
+a/*infix comment*/=/*mid*/(b);
+/* nested /* inner */ end */ a = a + 1;
+/* open
+   /* nested
+   closes */ still in comment? */ a = 42;

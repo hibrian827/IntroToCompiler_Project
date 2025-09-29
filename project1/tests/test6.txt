@@ -1,0 +1,11 @@
+struct _point {
+  float x, y, z;
+  int color;
+};
+struct _point p[2];
+int color;      /* 키워드 int / 식별자 color (중복 등장) */
+float floaty;   /* 키워드 float / 식별자 floaty (접두사 혼동 금지) */
+int intint;     /* 식별자 'intint' (키워드와 다름) */
+struct structX; /* 식별자 'structX' */
+return;         /* 키워드 return */
+NULL;           /* 키워드 NULL */
