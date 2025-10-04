@@ -61,12 +61,12 @@ FLOAT_CONST   {digit}+\.{digit}*([eE][-+]?{digit}+)?
   /* ignore rest in comments */
 <BB>. {}
 
-  /* if operator detected */
+  /* operator detected */
 <AA>{OP} {
   printf("OP\t%s\n", yytext);
 }
 
-  /* if ID detected */
+  /* ID detected */
 <AA>{ID} {
   unsigned idx = hash(yytext);
   id *data = search(idx, yytext, yyleng);
@@ -91,7 +91,6 @@ FLOAT_CONST   {digit}+\.{digit}*([eE][-+]?{digit}+)?
 
   /* detect .. behind digit */
 <AA>{digit}*\./\.{digit} {
-  // with digit
   if(yyleng > 1) {
     printf("INT\t");
     for(int i = 0; i < yyleng - 1; i++) printf("%c", yytext[i]);
@@ -101,11 +100,12 @@ FLOAT_CONST   {digit}+\.{digit}*([eE][-+]?{digit}+)?
   input();
 }
 
-  /* if int constant detected */
+  /* int constant detected */
 <AA>{INT_CONST} {
   printf("INT\t%s\n", yytext);
 }
-  /* if int constant detected */
+
+  /* float constant detected */
 <AA>{FLOAT_CONST} {
   printf("F\t%s\n", yytext);
 }
