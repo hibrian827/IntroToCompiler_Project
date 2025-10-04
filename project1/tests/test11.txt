@@ -1,0 +1,8 @@
+struct _point { float x, y, z; int color; };
+struct _point p[2];
+int color;
+float floaty;
+int intint;
+struct structX;
+return;
+NULL;

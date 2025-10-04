@@ -1,0 +1,3 @@
+/* pre */ struct S { int a; }; /* post */
+struct S s;
+S *p[2];

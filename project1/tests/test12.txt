@@ -1,0 +1,4 @@
+a = (b + c) * d / e % f;        /* arithmetic */
+a/*infix*/=/*mid*/(b);          /* comments inside */
+1..2; 10 .. 20;                 /* dotdot spacing variants */
+5.; 0.5; 12.0e-3;               /* floats */
