@@ -14,8 +14,6 @@
 #include "subc.tab.h"
 static int comment_depth = 0;
 static int lineno = 1;
-
-#define KEY 0
 %}
 
 /* Definitions Section */
@@ -38,7 +36,7 @@ NONSYM_OP     "("|")"|"["|"]"|"{"|"}"|"."|","|"!"|"*"|"/"|"%"|"+"|"-"|"&"|";"|"=
   /* All comments in this section must be indented. */
 
   /* Keywords */
-"int" | "char"                  { return TYPE; }
+"int"|"char"                    { return TYPE; }
 "struct"                        { return STRUCT; }
 "NULL"                          { return SYM_NULL; }
 "return"                        { return RETURN; }
@@ -114,7 +112,7 @@ int get_lineno() {
 int main(int argc, char* argv[]) {
   // Define reserved keywords
   char *keyword[] = { "int", "char", "struct", "NULL", "return", "if", "else", "while", "for", "break", "continue", NULL };
-  int tokentype[] = { KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, -1 };  // placeholder; later something like { TYPE, 0 }
+  int tokentype[] = { TYPE, TYPE, STRUCT, SYM_NULL, RETURN, IF, ELSE, WHILE, FOR, BREAK, CONTINUE, -1 };  // placeholder; later something like { TYPE, 0 }
 
   // Initialize the hash table
   for(int i=0; keyword[i] != NULL; i++) {

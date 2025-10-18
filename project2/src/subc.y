@@ -28,7 +28,6 @@ void  reduce(char* s);
 }
 
 /* Precedences and Associativities */
-/* TODO: left, right accordingly - esp incop and decop */
 %left ','
 %right '='
 %left LOGICAL_OR 
@@ -37,11 +36,14 @@ void  reduce(char* s);
 %left RELOP
 %left '+' '-'
 %left '*'  '/' '%'
-%right ""
-%left STRUCTOP '(' ')' '.' INCOP DECOP
+%right '!' '&' INCOP DECOP 
+%left STRUCTOP '(' ')' '.' '[' ']'
+
+%nonassoc ONLY_IF
+%nonassoc ELSE
 
 /* Tokens and Types */
-%token            TYPE STRUCT SYM_NULL RETURN IF ELSE WHILE FOR BREAK CONTINUE
+%token            TYPE STRUCT SYM_NULL RETURN IF WHILE FOR BREAK CONTINUE
 %token<stringVal> ID CHAR_CONST STRING
 %token<intVal>    INTEGER_CONST
 
@@ -212,7 +214,7 @@ stmt
   {
     REDUCE("stmt->';'");
   }
-  | IF '(' expr ')' stmt
+  | IF '(' expr ')' stmt %prec ONLY_IF
   {
     REDUCE("stmt->IF '(' expr ')' stmt");
   }
@@ -291,7 +293,7 @@ binary
   }
   | unary %prec '='
   {
-    REDUCE("binary->unary %prec '='");
+    REDUCE("binary->unary");
   }
   | binary LOGICAL_AND binary
   {
@@ -304,7 +306,11 @@ binary
   ;
 
 unary
-  : INTEGER_CONST
+  : '(' expr ')'
+  {
+    REDUCE("unary->'(' expr ')'");
+  }
+  | INTEGER_CONST
   {
     REDUCE("unary->INTEGER_CONST");
   }
@@ -320,7 +326,75 @@ unary
   {
     REDUCE("unary->ID");
   }
+  | '-' unary %prec '!'
+  {
+    REDUCE("unary->'-' unary");
+  }
+  | '!' unary
+  {
+    REDUCE("unary->'!' unary");
+  }
+  | unary INCOP %prec STRUCTOP
+  {
+    REDUCE("unary->unary INCOP");
+  }
+  | unary DECOP %prec STRUCTOP
+  {
+    REDUCE("unary->unary DECOP");
+  }
+  | INCOP unary
+  {
+    REDUCE("unary->INCOP unary");
+  }
+  | DECOP unary
+  {
+    REDUCE("unary->DECOP unary");
+  }
+  | '&' unary
+  {
+    REDUCE("unary->'&' unary");
+  }
+  | '*' unary %prec '!'
+  {
+    REDUCE("unary->'*' unary");
+  }
+  | unary '[' expr ']'
+  {
+    REDUCE("unary->unary '[' expr ']'");
+  }
+  | unary '.' ID
+  {
+    REDUCE("unary->unary '.' ID");
+  }
+  | unary STRUCTOP ID
+  {
+    REDUCE("unary->unary STRUCTOP ID");
+  }
+  | unary '(' args ')'
+  {
+    REDUCE("unary->unary '(' args ')'");
+  }
+  | unary '(' ')'
+  {
+    REDUCE("unary->unary '(' ')'");
+  }
+  | SYM_NULL
+  {
+    REDUCE("unary->SYM_NULL");
+  }
   ;
+
+args
+  : expr
+  {
+    REDUCE("args->expr");
+  }
+  | args ',' expr
+  {
+    REDUCE("args->args ',' expr");
+  }
+  ;
+
 
 %%
 
