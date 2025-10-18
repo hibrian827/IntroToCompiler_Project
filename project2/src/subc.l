@@ -14,6 +14,8 @@
 #include "subc.tab.h"
 static int comment_depth = 0;
 static int lineno = 1;
+
+#define KEY 0
 %}
 
 /* Definitions Section */
@@ -25,6 +27,7 @@ id            {letter}({letter}|{digit})*
 integer_const ([1-9]{digit}*)|"0"
 whitespace    [ \t]
 special_char  \\[nt]
+NONSYM_OP     "("|")"|"["|"]"|"{"|"}"|"."|","|"!"|"*"|"/"|"%"|"+"|"-"|"&"|";"|"="
 
 %x COMMENT
 
@@ -37,6 +40,14 @@ special_char  \\[nt]
   /* Keywords */
 "int" | "char"                  { return TYPE; }
 "struct"                        { return STRUCT; }
+"NULL"                          { return SYM_NULL; }
+"return"                        { return RETURN; }
+"if"                            { return IF; }
+"else"                          { return ELSE; }
+"while"                         { return WHILE; }
+"for"                           { return FOR; }
+"break"                         { return BREAK; }
+"continue"                      { return CONTINUE; }
 
   /* Identifiers */
 {id}                            {
@@ -64,8 +75,14 @@ special_char  \\[nt]
                                 }
 
   /* Operators */
-","                             { return ','; }
-";"                             { return yytext[0]; }
+{NONSYM_OP}                     { return yytext[0]; }
+"||"                            { return LOGICAL_OR; }
+"&&"                            { return LOGICAL_AND; }
+"<"|"<="|">"|">="               { return RELOP; }
+"=="|"!="                       { return EQUOP; }
+"++"                            { return INCOP;}
+"--"                            { return DECOP; }
+"->"                            { return STRUCTOP; }
 
   /* Whitespaces */
 {whitespace}
@@ -96,8 +113,8 @@ int get_lineno() {
 
 int main(int argc, char* argv[]) {
   // Define reserved keywords
-  char *keyword[] = { "int", NULL };
-  int tokentype[] = { TYPE, 0 };
+  char *keyword[] = { "int", "char", "struct", "NULL", "return", "if", "else", "while", "for", "break", "continue", NULL };
+  int tokentype[] = { KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, KEY, -1 };  // placeholder; later something like { TYPE, 0 }
 
   // Initialize the hash table
   for(int i=0; keyword[i] != NULL; i++) {
