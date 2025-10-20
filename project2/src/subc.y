@@ -202,9 +202,9 @@ stmt
   {
     REDUCE("stmt->compound_stmt");
   }
-  | RETURN ';'
+  | RETURN expr ';'
   {
-    REDUCE("stmt->RETURN ';'");
+    REDUCE("stmt->RETURN expr ';'");
   }
   | ';'
   {
