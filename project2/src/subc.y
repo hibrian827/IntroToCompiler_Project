@@ -206,10 +206,6 @@ stmt
   {
     REDUCE("stmt->RETURN ';'");
   }
-  | RETURN expr ';'
-  {
-    REDUCE("stmt->RETURN expr ';'");
-  }
   | ';'
   {
     REDUCE("stmt->';'");
